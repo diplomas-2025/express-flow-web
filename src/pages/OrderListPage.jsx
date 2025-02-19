@@ -60,7 +60,7 @@ export const OrdersListPage = () => {
         // Очищаем данные пользователя (например, токен аутентификации)
         localStorage.removeItem("authToken"); // Удаляем токен из localStorage
         // Перенаправляем пользователя на страницу входа
-        navigate("/"); // Переход на страницу входа
+        window.location.href = "/";
     };
 
     return (

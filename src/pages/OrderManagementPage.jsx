@@ -129,7 +129,7 @@ export const OrderManagementPage = () => {
 
     // Обработчик изменения статуса в истории
     const handleStatusHistoryChange = (statusId, newStatus) => {
-        OrderTrackingAPI.updateTrackingStatus(statusId, newStatus)
+        OrderTrackingAPI.updateOrderTrackingStatus(statusId, newStatus)
             .then((response) => {
                 console.log("Статус успешно обновлен:", response.data);
                 // Обновляем список истории статусов

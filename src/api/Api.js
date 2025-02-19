@@ -36,7 +36,7 @@ const OrderAPI = {
 
     // Обновить статус заказа
     updateOrderStatus: (id, status) =>
-        api.put(`/api/v1/orders/${id}/status`, { status }),
+        api.put(`/api/v1/orders/${id}/status`, status),
 };
 
 // Запросы для работы с отслеживанием заказов
@@ -57,7 +57,7 @@ const OrderTrackingAPI = {
 
     // Обновить статус отслеживания
     updateOrderTrackingStatus: (id, status) =>
-        api.put(`/api/v1/order-tracking/${id}/status`, { status }),
+        api.put(`/api/v1/order-tracking/${id}/status`, status),
 };
 
 // Запросы для работы с транспортными средствами
@@ -113,15 +113,19 @@ const AuthAPI = {
     // Вход пользователя
     signIn: async (credentials) => {
         const response = await api.post('/users/security/sign-in', credentials);
-        const { accessToken } = response.data; // Предполагаем, что токен возвращается в поле accessToken
+        const { accessToken, isAdmin, userId } = response.data; // Предполагаем, что токен возвращается в поле accessToken
         localStorage.setItem('authToken', accessToken); // Сохраняем токен в localStorage
+        localStorage.setItem('isAdmin', isAdmin); // Сохраняем токен в localStorage
+        localStorage.setItem('userId', userId); // Сохраняем токен в localStorage
         return response.data; // Возвращаем данные ответа
     },
 
     signUp: async (data) => {
         const response = await api.post('/users/security/sign-up', data);
-        const { accessToken } = response.data; // Предполагаем, что токен возвращается в поле accessToken
+        const { accessToken, isAdmin, userId } = response.data; // Предполагаем, что токен возвращается в поле accessToken
         localStorage.setItem('authToken', accessToken); // Сохраняем токен в localStorage
+        localStorage.setItem('isAdmin', isAdmin); // Сохраняем токен в localStorage
+        localStorage.setItem('userId', userId); // Сохраняем токен в localStorage
         return response.data; // Возвращаем данные ответа
     },
 

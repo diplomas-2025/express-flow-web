@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ClientAPI, OrderAPI } from "../api/Api"; // Предполагаем, что API для заказов и пользователей уже настроены
+import {CargoAPI, ClientAPI, OrderAPI} from "../api/Api"; // Предполагаем, что API для заказов и пользователей уже настроены
 import { Box, Typography, TextField, Button, Select, MenuItem, InputLabel, FormControl, Grid, Card, CardContent } from "@mui/material";
 import { FaUser, FaBox, FaTruck, FaMapMarkerAlt, FaPlus } from "react-icons/fa"; // Иконки
 import { keyframes } from "@emotion/react";
@@ -70,9 +70,21 @@ export const CreateOrderPage = () => {
             recipientId: parseInt(formData.recipientId, 10),
         };
 
-        // Отправляем данные на сервер
-        OrderAPI.createOrder(payload)
-            .then((response) => {
+        CargoAPI.createCargo({
+            clientId: payload.clientId,
+            recipientId: payload.recipientId,
+            description: payload.description,
+            weight: payload.weight,
+            volume: payload.volume,
+            pickupAddress: payload.pickupAddress,
+            deliveryAddress: payload.deliveryAddress
+        }).then((response) => {
+            OrderAPI.createOrder({
+                cargoId: response.data.id,
+                driverId: 1,
+                vehicleId: 1,
+                status: "PENDING"
+            }).then(() => {
                 console.log("Заказ успешно создан:", response.data);
                 alert("Заказ успешно создан!");
                 // Очищаем форму после успешного создания
@@ -85,11 +97,12 @@ export const CreateOrderPage = () => {
                     pickupAddress: "",
                     deliveryAddress: "",
                 });
-            })
-            .catch((error) => {
-                console.error("Ошибка при создании заказа:", error);
+            }).catch(() => {
                 alert("Ошибка при создании заказа. Пожалуйста, попробуйте снова.");
-            });
+            })
+        }).catch(() => {
+            alert("Ошибка при создании заказа. Пожалуйста, попробуйте снова.");
+        })
     };
 
     return (

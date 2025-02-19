@@ -77,6 +77,12 @@ export const UserPage = () => {
             }
         });
 
+        const userId = localStorage.getItem("userId")
+        console.log(userId)
+        filteredData = filteredData.filter(order => {
+            return order.cargo.client.id == userId || order.cargo.recipient.id == userId
+        })
+
         setFilteredOrders(filteredData);
     }, [statusFilter, sortOrder, orders]);
 

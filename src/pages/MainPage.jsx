@@ -48,7 +48,7 @@ const MainPage = () => {
     const handleLogin = () => {
         AuthAPI.signIn({ email, password })
             .then(() => {
-                navigate("/user")
+                window.location.reload();
             })
             .catch(() => {
                 alert('Неверный email или пароль');
@@ -59,7 +59,7 @@ const MainPage = () => {
     const handleRegister = () => {
         AuthAPI.signUp(registerData)
             .then(() => {
-                navigate("/user")
+                window.location.reload();
             })
             .catch((error) => {
                 console.error('Ошибка при регистрации:', error);
