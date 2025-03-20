@@ -1,34 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { OrderAPI } from "../api/Api"; // Предполагаем, что API для заказов уже настроен
-import { Box, Typography, Card, CardContent, Stack, Chip, Grid, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom"; // Для навигации между экранами
+import { Card, Button, Row, Col, Typography, Tag, Space, Avatar, Divider } from "antd"; // Импортируем компоненты Ant Design
 import { FaBox, FaUser, FaCalendarAlt, FaPlus, FaSignOutAlt } from "react-icons/fa"; // Иконки
-import { keyframes } from "@emotion/react";
-import { styled } from "@mui/system";
 import { translateOrderStatus } from "./OrderTracking";
-import {StyledButton} from "./UserPage";
 
-// Анимация для карточек
-const fadeIn = keyframes`
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-`;
-
-// Стилизованный компонент Card
-const StyledCard = styled(Card)(({ theme }) => ({
-    borderRadius: theme.spacing(2),
-    transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-    animation: `${fadeIn} 0.5s ease-in-out`,
-    "&:hover": {
-        transform: "scale(1.02)",
-    },
-}));
+const { Title, Text } = Typography;
 
 export const OrdersListPage = () => {
     const [orders, setOrders] = useState([]); // Список всех заказов
@@ -57,66 +34,126 @@ export const OrdersListPage = () => {
 
     // Обработчик выхода из аккаунта
     const handleLogout = () => {
-        // Очищаем данные пользователя (например, токен аутентификации)
         localStorage.removeItem("authToken"); // Удаляем токен из localStorage
-        // Перенаправляем пользователя на страницу входа
-        window.location.href = "/";
+        window.location.href = "/"; // Перенаправляем пользователя на страницу входа
     };
 
     return (
-        <Box sx={{ p: 3, background: "linear-gradient(135deg, #f5f7fa, #c3cfe2)", minHeight: "100vh" }}>
+        <div style={{ padding: "24px", background: "linear-gradient(135deg, #f5f7fa, #e6e9ef)", minHeight: "100vh" }}>
             {/* Заголовок, кнопка создания заказа и кнопка выхода */}
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
-                <Typography variant="h4" sx={{ fontWeight: "bold", color: "primary.main" }}>
-                    Список заказов
-                </Typography>
-                <Box sx={{ display: "flex", gap: 2 }}>
+            <Row justify="space-between" align="middle" style={{ marginBottom: "24px" }}>
+                <Title level={2} style={{ color: "#2c3e50", fontWeight: "bold" }}>
+                    Заказы
+                </Title>
+                <Space>
+                    <div>
+                        <Button
+                            type="primary"
+                            shape="round"
+                            icon={<FaPlus />}
+                            onClick={handleCreateOrderClick}
+                            style={{ background: "#3498db", border: "none", fontWeight: "bold" }}
+                        >
+                            Новый заказ
+                        </Button>
+
+                        <Button
+                            type="primary"
+                            shape="round"
+                            icon={<FaPlus />}
+                            onClick={() => navigate("/vehicles")}
+                            style={{ background: "#3498db", border: "none", fontWeight: "bold" }}
+                        >
+                            Транспортные средства
+                        </Button>
+
+                        <Button
+                            type="primary"
+                            shape="round"
+                            icon={<FaPlus />}
+                            onClick={() => navigate("/drivers")}
+                            style={{ background: "#3498db", border: "none", fontWeight: "bold" }}
+                        >
+                            Водители
+                        </Button>
+                    </div>
                     <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<FaPlus />}
-                        onClick={handleCreateOrderClick}
-                        sx={{ textTransform: "none", fontWeight: "bold", borderRadius: "15px" }}
+                        type="default"
+                        shape="round"
+                        danger
+                        icon={<FaSignOutAlt />}
+                        onClick={handleLogout}
+                        style={{ fontWeight: "bold" }}
                     >
-                        Создать заказ
+                        Выйти
                     </Button>
-                    <StyledButton variant="contained" color="secondary" onClick={handleLogout}>
-                        Выход
-                    </StyledButton>
-                </Box>
-            </Box>
+                </Space>
+            </Row>
 
             {/* Список заказов */}
-            <Grid container spacing={3}>
+            <Row gutter={[24, 24]}>
                 {orders.map((order) => (
-                    <Grid item xs={12} sm={6} md={4} key={order.id}>
-                        <StyledCard onClick={() => handleOrderClick(order.id)} sx={{ cursor: "pointer" }}>
-                            <CardContent>
-                                <Typography variant="h6" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                    <FaBox /> Заказ #{order.id}
-                                </Typography>
-                                <Stack spacing={2}>
-                                    <Box display="flex" alignItems="center" gap={1}>
-                                        <Chip label={translateOrderStatus(order.status)} color="primary" sx={{ fontWeight: "bold" }} />
-                                    </Box>
-                                    <Box display="flex" alignItems="center" gap={1}>
-                                        <FaUser />
-                                        <b>Клиент:</b> {order.cargo.client.name} ({order.cargo.client.phone})
-                                    </Box>
-                                    <Box display="flex" alignItems="center" gap={1}>
-                                        <FaUser />
-                                        <b>Получатель:</b> {order.cargo.recipient.name} ({order.cargo.recipient.phone})
-                                    </Box>
-                                    <Box display="flex" alignItems="center" gap={1}>
-                                        <FaCalendarAlt />
-                                        <b>Дата заказа:</b> {new Date(order.orderDate).toLocaleDateString()}
-                                    </Box>
-                                </Stack>
-                            </CardContent>
-                        </StyledCard>
-                    </Grid>
+                    <Col xs={24} sm={12} md={8} lg={6} key={order.id}>
+                        <Card
+                            hoverable
+                            onClick={() => handleOrderClick(order.id)}
+                            style={{
+                                borderRadius: "12px",
+                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                                transition: "transform 0.2s, box-shadow 0.2s",
+                                background: "#ffffff",
+                                border: "none",
+                            }}
+                            bodyStyle={{ padding: "16px" }}
+                        >
+                            <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+                                <Title level={4} style={{ margin: 0, color: "#2c3e50" }}>
+                                    Номер заказа: {order.id}
+                                </Title>
+
+                                {/* Статус заказа */}
+                                <Tag
+                                    color={
+                                        order.status === "completed"
+                                            ? "green"
+                                            : order.status === "pending"
+                                                ? "orange"
+                                                : "red"
+                                    }
+                                    style={{ fontWeight: "bold", borderRadius: "12px" }}
+                                >
+                                    {translateOrderStatus(order.status)}
+                                </Tag>
+
+                                {/* Информация о клиенте и получателе */}
+                                <Divider style={{ margin: "8px 0" }} />
+                                <Text strong style={{ color: "#7f8c8d" }}>
+                                    <FaUser /> Клиент:
+                                </Text>
+                                <Text style={{ display: "block", color: "#34495e" }}>
+                                    {order.cargo.client.name} ({order.cargo.client.phone})
+                                </Text>
+
+                                <Text strong style={{ color: "#7f8c8d" }}>
+                                    <FaUser /> Получатель:
+                                </Text>
+                                <Text style={{ display: "block", color: "#34495e" }}>
+                                    {order.cargo.recipient.name} ({order.cargo.recipient.phone})
+                                </Text>
+
+                                {/* Дата заказа */}
+                                <Divider style={{ margin: "8px 0" }} />
+                                <Text strong style={{ color: "#7f8c8d" }}>
+                                    <FaCalendarAlt /> Дата заказа:
+                                </Text>
+                                <Text style={{ display: "block", color: "#34495e" }}>
+                                    {new Date(order.orderDate).toLocaleDateString()}
+                                </Text>
+                            </Space>
+                        </Card>
+                    </Col>
                 ))}
-            </Grid>
-        </Box>
+            </Row>
+        </div>
     );
 };

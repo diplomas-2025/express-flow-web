@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Базовый URL API
-const API_BASE_URL = 'https://spotdiff.ru/cargo-tracking-system-api';
+const API_BASE_URL = 'https://spotdiff.ru/express-flow-api';
 
 // Создаем экземпляр Axios с базовыми настройками
 const api = axios.create({
@@ -70,6 +70,7 @@ const VehicleAPI = {
 
     // Создать новое транспортное средство
     createVehicle: (vehicleData) => api.post('/api/v1/vehicles', vehicleData),
+    updateVehicleStatus: (vehicleId, newStatus) => api.patch('/api/v1/vehicles/' + vehicleId + "?status=" + newStatus),
 };
 
 // Запросы для работы с водителями
@@ -82,6 +83,7 @@ const DriverAPI = {
 
     // Создать нового водителя
     createDriver: (driverData) => api.post('/api/v1/drivers', driverData),
+    updateDriverStatus: (driverId, newStatus) => api.patch(`/api/v1/drivers/${driverId}/status?status=${newStatus}`),
 };
 
 // Запросы для работы с клиентами
@@ -172,3 +174,45 @@ export {
     CargoAPI,
     AuthAPI,
 };
+
+export function getVehicleStatusOrType(value) {
+    const statuses = {
+        AVAILABLE: 'Доступен',
+        IN_TRANSIT: 'В пути',
+        UNDER_MAINTENANCE: 'На ремонте'
+    };
+
+    const types = {
+        TRUCK: 'Грузовик',
+        VAN: 'Фургон',
+        MOTORCYCLE: 'Мотоцикл'
+    };
+
+    // Если значение соответствует статусу
+    if (statuses[value]) {
+        return statuses[value];
+    }
+    // Если значение соответствует типу
+    if (types[value]) {
+        return types[value];
+    }
+
+    return value; // Если не найдено соответствие, возвращаем исходное значение
+}
+
+
+export function getDriverStatus2(value) {
+    const statuses = {
+        ACTIVE: "Активен",
+        INACTIVE: "Неактивен",
+        ON_LEAVE: "В отпуске",
+        SUSPENDED: "Отстранен",
+    };
+
+    // Если значение соответствует статусу
+    if (statuses[value]) {
+        return statuses[value];
+    }
+
+    return value; // Если не найдено соответствие, возвращаем исходное значение
+}

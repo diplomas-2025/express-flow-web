@@ -1,238 +1,167 @@
 import React, { useState } from 'react';
-import {
-    Container,
-    TextField,
-    Button,
-    Typography,
-    Box,
-    Card,
-    CardContent,
-    Grid,
-    Tabs,
-    Tab,
-} from '@mui/material';
-import { AuthAPI, OrderTrackingAPI } from '../api/Api';
-import { FaSearch, FaSignInAlt, FaTruck, FaUserPlus } from 'react-icons/fa'; // Иконки
-import OrderTracking from './OrderTracking';
-import {useNavigate} from "react-router-dom"; // Импортируем компонент
+import { Button, Card, Col, Input, Row, Typography, Space, message } from 'antd';
+import { LoginOutlined, UserAddOutlined, TruckOutlined, SearchOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { AuthAPI } from '../api/Api';
+
+const { Title, Text } = Typography;
 
 const MainPage = () => {
-    const navigate = useNavigate()
-    const [orderNumber, setOrderNumber] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [trackingInfo, setTrackingInfo] = useState(null);
-    const [tabValue, setTabValue] = useState(0); // Состояние для переключения между вкладками
+    const [tabIndex, setTabIndex] = useState(0);
+    const [registerData, setRegisterData] = useState({ name: '', email: '', phone: '', password: '' });
+    const navigate = useNavigate();
 
-    // Состояние для регистрации
-    const [registerData, setRegisterData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        password: '',
-    });
-
-    // Функция для отслеживания заказа
-    const handleTrackOrder = async () => {
-        try {
-            // Запрос к API для получения данных о заказе
-            const response = await OrderTrackingAPI.getOrderTrackingByOrderId(orderNumber);
-            setTrackingInfo(response.data); // Сохраняем данные в состоянии
-        } catch (error) {
-            console.error('Ошибка при получении данных о заказе:', error);
-            alert('Не удалось получить информацию о заказе. Проверьте номер заказа.');
-        }
-    };
-
-    // Функция для входа
     const handleLogin = () => {
         AuthAPI.signIn({ email, password })
-            .then(() => {
-                window.location.reload();
-            })
-            .catch(() => {
-                alert('Неверный email или пароль');
-            });
+            .then(() => window.location.reload())
+            .catch(() => message.error('Неверный email или пароль'));
     };
 
-    // Функция для регистрации
     const handleRegister = () => {
         AuthAPI.signUp(registerData)
-            .then(() => {
-                window.location.reload();
-            })
-            .catch((error) => {
-                console.error('Ошибка при регистрации:', error);
-                alert('Ошибка при регистрации. Проверьте введенные данные.');
-            });
-    };
-
-    // Обработчик изменения вкладки
-    const handleTabChange = (event, newValue) => {
-        setTabValue(newValue);
+            .then(() => window.location.reload())
+            .catch(() => message.error('Ошибка при регистрации. Проверьте введенные данные.'));
     };
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-            {/* Заголовок */}
-            <Typography
-                variant="h3"
-                component="h1"
-                align="center"
-                gutterBottom
-                sx={{ fontWeight: 'bold', color: 'primary.main', mb: 4 }}
-            >
-                <FaTruck style={{ marginRight: '10px', verticalAlign: 'middle' }} />
-                Сервис доставки грузов
-            </Typography>
-            <Typography variant="h5" component="h2" align="center" gutterBottom sx={{ color: 'text.secondary' }}>
-                ООО «АвтоТансИндустрия»
-            </Typography>
-
-            {/* Блок отслеживания заказа */}
-            <Card sx={{ mb: 4, boxShadow: 3, borderRadius: 2 }}>
-                <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <FaSearch />
+        <Row justify="center" style={{ marginTop: 40, marginBottom: 40 }}>
+            <Col xs={24} sm={20} md={12} lg={10} xl={8}>
+                <div
+                    style={{
+                        textAlign: 'center',
+                        marginBottom: 32,
+                        padding: '40px 20px',
+                        background: 'linear-gradient(135deg, #1890ff, #0050b3)',
+                        borderRadius: 16,
+                        boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+                        color: '#fff',
+                    }}
+                >
+                    <TruckOutlined
+                        style={{
+                            fontSize: 64,
+                            color: '#fff',
+                            animation: 'float 3s ease-in-out infinite',
+                        }}
+                    />
+                    <Title
+                        level={2}
+                        style={{
+                            marginTop: 16,
+                            color: '#fff',
+                            fontWeight: 600,
+                            letterSpacing: '1px',
+                        }}
+                    >
+                        Быстрая и надежная доставка
+                    </Title>
+                    <Text
+                        style={{
+                            display: 'block',
+                            textAlign: 'center',
+                            marginBottom: 16,
+                            fontSize: 16,
+                            color: 'rgba(255, 255, 255, 0.8)',
+                        }}
+                    >
+                        ООО «ЭКСПРЕССГРУПП» — ваш надежный партнер в логистике
+                    </Text>
+                    <Button
+                        type="primary"
+                        size="large"
+                        style={{
+                            marginTop: 16,
+                            background: '#fff',
+                            color: '#1890ff',
+                            border: 'none',
+                            borderRadius: 8,
+                            fontWeight: 500,
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                        }}
+                        onClick={() => navigate('/track-order')}
+                    >
                         Отследить заказ
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <TextField
-                            fullWidth
-                            label="Номер заказа"
-                            variant="outlined"
-                            value={orderNumber}
-                            onChange={(e) => setOrderNumber(e.target.value)}
-                            sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}
-                        />
-                        <Button
-                            variant="contained"
-                            onClick={handleTrackOrder}
-                            sx={{ height: '56px', borderRadius: 1 }}
-                        >
-                            Отследить
-                        </Button>
-                    </Box>
-                    {trackingInfo && <OrderTracking orderData={trackingInfo} />}
-                </CardContent>
-            </Card>
+                    </Button>
+                </div>
 
-            {/* Вкладки для входа и регистрации */}
-            <Card sx={{ mb: 4, boxShadow: 3, borderRadius: 2 }}>
-                <CardContent>
-                    <Tabs value={tabValue} onChange={handleTabChange} centered>
-                        <Tab label="Вход" icon={<FaSignInAlt />} />
-                        <Tab label="Регистрация" icon={<FaUserPlus />} />
-                    </Tabs>
+                <Space style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+                    <Button
+                        type={tabIndex === 0 ? "primary" : "default"}
+                        icon={<LoginOutlined />}
+                        onClick={() => setTabIndex(0)}
+                        style={{ borderRadius: 8 }}
+                    >
+                        Вход
+                    </Button>
+                    <Button
+                        type={tabIndex === 1 ? "primary" : "default"}
+                        icon={<UserAddOutlined />}
+                        onClick={() => setTabIndex(1)}
+                        style={{ borderRadius: 8 }}
+                    >
+                        Регистрация
+                    </Button>
+                </Space>
 
-                    {tabValue === 0 && (
-                        // Форма входа
-                        <Box sx={{ mt: 2 }}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        label="Email"
-                                        type="email"
-                                        variant="outlined"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        label="Пароль"
-                                        type="password"
-                                        variant="outlined"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Button fullWidth variant="contained" onClick={handleLogin} sx={{ borderRadius: 1 }}>
-                                        Войти
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </Box>
-                    )}
+                {tabIndex === 0 && (
+                    <Card style={{ borderRadius: 8, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+                        <Space direction="vertical" style={{ width: '100%' }}>
+                            <Input
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                style={{ borderRadius: 8 }}
+                            />
+                            <Input.Password
+                                placeholder="Пароль"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                style={{ borderRadius: 8 }}
+                            />
+                            <Button type="primary" onClick={handleLogin} style={{ borderRadius: 8 }}>
+                                Войти
+                            </Button>
+                        </Space>
+                    </Card>
+                )}
 
-                    {tabValue === 1 && (
-                        // Форма регистрации
-                        <Box sx={{ mt: 2 }}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        label="Имя"
-                                        variant="outlined"
-                                        value={registerData.name}
-                                        onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
-                                        sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        label="Email"
-                                        type="email"
-                                        variant="outlined"
-                                        value={registerData.email}
-                                        onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-                                        sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        label="Телефон"
-                                        variant="outlined"
-                                        value={registerData.phone}
-                                        onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
-                                        sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        label="Пароль"
-                                        type="password"
-                                        variant="outlined"
-                                        value={registerData.password}
-                                        onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                                        sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Button fullWidth variant="contained" onClick={handleRegister} sx={{ borderRadius: 1 }}>
-                                        Зарегистрироваться
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </Box>
-                    )}
-                </CardContent>
-            </Card>
-
-            {/* Информация о компании */}
-            <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
-                <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                        О компании
-                    </Typography>
-                    <Typography paragraph>
-                        ООО «АвтоТансИндустрия» — это современная компания, специализирующаяся на доставке грузов по всей России. Мы
-                        предлагаем надежные и быстрые решения для ваших логистических потребностей.
-                    </Typography>
-                    <Typography paragraph>
-                        Наши контакты: +7 (930) 312-12-32, email: info@avtotransindustry.ru
-                    </Typography>
-                </CardContent>
-            </Card>
-        </Container>
+                {tabIndex === 1 && (
+                    <Card style={{ borderRadius: 8, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+                        <Space direction="vertical" style={{ width: '100%' }}>
+                            <Input
+                                placeholder="Имя"
+                                value={registerData.name}
+                                onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
+                                style={{ borderRadius: 8 }}
+                            />
+                            <Input
+                                placeholder="Email"
+                                value={registerData.email}
+                                onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                                style={{ borderRadius: 8 }}
+                            />
+                            <Input
+                                placeholder="Телефон"
+                                value={registerData.phone}
+                                onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
+                                style={{ borderRadius: 8 }}
+                            />
+                            <Input.Password
+                                placeholder="Пароль"
+                                value={registerData.password}
+                                onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                                style={{ borderRadius: 8 }}
+                            />
+                            <Button type="primary" onClick={handleRegister} style={{ borderRadius: 8 }}>
+                                Зарегистрироваться
+                            </Button>
+                        </Space>
+                    </Card>
+                )}
+            </Col>
+        </Row>
     );
 };
 

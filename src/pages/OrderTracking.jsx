@@ -1,27 +1,15 @@
 import React from "react";
-import {
-    Card,
-    CardContent,
-    Typography,
-    List,
-    ListItem,
-    ListItemText,
-    Chip,
-    Paper,
-    Box,
-    Divider,
-    Stack,
-    Avatar,
-} from "@mui/material";
+import { Card, Progress, Timeline, Typography, Space } from "antd";
 import {
     FaBox,
-    FaWeightHanging,
-    FaRuler,
     FaMapMarkerAlt,
     FaUser,
     FaTruck,
-    FaHistory,
+    FaWeightHanging,
+    FaRuler,
 } from "react-icons/fa";
+
+const { Title, Text } = Typography;
 
 export const translateOrderStatus = (status) => {
     switch (status) {
@@ -38,9 +26,16 @@ export const translateOrderStatus = (status) => {
     }
 };
 
+const statusToProgress = {
+    PENDING: 25,
+    IN_TRANSIT: 50,
+    DELIVERED: 100,
+    CANCELED: 0,
+};
+
 const OrderTracking = ({ orderData }) => {
     if (!orderData || orderData.length === 0) {
-        return <Typography>Нет данных о заказе.</Typography>;
+        return <Text>Нет данных о заказе.</Text>;
     }
 
     const order = orderData[0].order;
@@ -49,59 +44,37 @@ const OrderTracking = ({ orderData }) => {
     );
 
     return (
-        <Card sx={{ borderRadius: 3, boxShadow: 4, p: 2, mt: 3 }}>
-            <CardContent>
-                <Typography variant="h5" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <FaBox /> Заказ #{order.id}
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                <Stack spacing={2}>
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <FaWeightHanging /> <b>Вес:</b> {order.cargo.weight} кг
-                    </Box>
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <FaRuler /> <b>Объем:</b> {order.cargo.volume} м³
-                    </Box>
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <FaMapMarkerAlt /> <b>Откуда:</b> {order.cargo.pickupAddress}
-                    </Box>
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <FaMapMarkerAlt /> <b>Куда:</b> {order.cargo.deliveryAddress}
-                    </Box>
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <Avatar sx={{ width: 24, height: 24 }} /> <b>Отправитель:</b> {order.cargo.client.name} ({order.cargo.client.phone})
-                    </Box>
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <Avatar sx={{ width: 24, height: 24 }} /> <b>Получатель:</b> {order.cargo.recipient.name} ({order.cargo.recipient.phone})
-                    </Box>
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <b>Статус заказа:</b>
-                        <Chip label={translateOrderStatus(order.status)} color="primary" />
-                    </Box>
-                </Stack>
+        <Card style={{ borderRadius: 12, padding: 20, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)" }}>
+            <Title level={3} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <FaBox /> Заказ #{order.id}
+            </Title>
 
-                <Divider sx={{ my: 3 }} />
-                <Typography variant="h6" sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-                    <FaHistory /> История статусов
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-                    <List>
-                        {sortedStatuses.map((track, index) => (
-                            <ListItem
-                                key={track.id}
-                                divider={index !== sortedStatuses.length - 1}
-                                sx={{ transition: "background-color 0.3s", "&:hover": { backgroundColor: "action.hover" } }}
-                            >
-                                <ListItemText
-                                    primary={<b>{track.location}</b>}
-                                    secondary={new Date(track.timestamp).toLocaleString()}
-                                />
-                                <Chip label={translateOrderStatus(track.status)} color="secondary" />
-                            </ListItem>
-                        ))}
-                    </List>
-                </Paper>
-            </CardContent>
+            <Space direction="vertical" size="large" style={{ width: "100%" }}>
+                <Progress percent={statusToProgress[order.status]} status={order.status === "CANCELED" ? "exception" : "active"} />
+
+                <Timeline>
+                    {sortedStatuses.map((track, index) => (
+                        <Timeline.Item key={index}>
+                            <Text strong>{translateOrderStatus(track.status)}</Text> – {new Date(track.timestamp).toLocaleString()} ({track.location})
+                        </Timeline.Item>
+                    ))}
+                </Timeline>
+
+                <Card type="inner" title="Детали заказа">
+                    <Text><FaWeightHanging /> Вес: {order.cargo.weight} кг</Text><br />
+                    <Text><FaRuler /> Объем: {order.cargo.volume} м³</Text><br />
+                    <Text><FaMapMarkerAlt /> Откуда: {order.cargo.pickupAddress}</Text><br />
+                    <Text><FaMapMarkerAlt /> Куда: {order.cargo.deliveryAddress}</Text><br />
+                    <Text><FaUser /> Отправитель: {order.cargo.client.name} ({order.cargo.client.phone})</Text><br />
+                    <Text><FaUser /> Получатель: {order.cargo.recipient.name} ({order.cargo.recipient.phone})</Text>
+                </Card>
+
+                <Card type="inner" title="Информация о транспорте">
+                    <Text><FaTruck /> Водитель: {order.driver.name} ({order.driver.phone})</Text><br />
+                    <Text><FaTruck /> Транспорт: {order.vehicle.licensePlate} ({order.vehicle.type})</Text><br />
+                    <Text><FaTruck /> Грузоподъемность: {order.vehicle.capacity} кг</Text>
+                </Card>
+            </Space>
         </Card>
     );
 };
