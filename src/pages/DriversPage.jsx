@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {DriverAPI, getVehicleStatusOrType, VehicleAPI} from "../api/Api"; // Предполагаем, что API для водителей и транспортных средств уже настроены
 import { Card, Button, Row, Col, Typography, Form, Select, Input, List, Space, Tag } from "antd"; // Импортируем компоненты Ant Design
-import { FaUser, FaPlus, FaCar } from "react-icons/fa"; // Иконки
+import { FaUser, FaPlus } from "react-icons/fa"; // Иконки
 
 const { Title, Text } = Typography;
 const { Option } = Select;

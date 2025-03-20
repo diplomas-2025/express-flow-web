@@ -60,7 +60,6 @@ export const OrdersListPage = () => {
                         <Button
                             type="primary"
                             shape="round"
-                            icon={<FaPlus />}
                             onClick={() => navigate("/vehicles")}
                             style={{ background: "#3498db", border: "none", fontWeight: "bold" }}
                         >
@@ -70,7 +69,6 @@ export const OrdersListPage = () => {
                         <Button
                             type="primary"
                             shape="round"
-                            icon={<FaPlus />}
                             onClick={() => navigate("/drivers")}
                             style={{ background: "#3498db", border: "none", fontWeight: "bold" }}
                         >

@@ -70,7 +70,7 @@ const VehicleAPI = {
 
     // Создать новое транспортное средство
     createVehicle: (vehicleData) => api.post('/api/v1/vehicles', vehicleData),
-    updateVehicleStatus: (vehicleId, newStatus) => api.patch('/api/v1/vehicles/' + vehicleId + "?status=" + newStatus),
+    updateVehicleStatus: (vehicleId, newStatus) => api.patch('/api/v1/vehicles/' + vehicleId + "/status?status=" + newStatus),
 };
 
 // Запросы для работы с водителями
